@@ -26,9 +26,15 @@ builder.Services.AddSingleton<IConexionDb, ConexionDb>();
 // Repositorios (Capa de Datos)
 //builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>(); 
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
+builder.Services.AddScoped<ICarritoRepository, CarritoRepository>();
+builder.Services.AddScoped<ICheckoutRepository, CheckoutRepository>();
 
 // Servicios (Capa de Lógica de Negocio)
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+builder.Services.AddScoped<ICarritoService, CarritoService>();
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 
 // Autenticacion y autorizacion con JWT
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
