@@ -20,8 +20,7 @@ namespace Legendary_Motorsport_Backend.Repositories
             {
                 await conexion.OpenAsync();
                 
-                // SQL optimizado para tus nuevos campos
-                string query = "INSERT INTO Clientes (Nombre, Apellido, Telefono, Email, IdRol) VALUES (@nombre, @apellido, @telefono, @email, @idRol)";
+                string query = "INSERT INTO Cliente (nombre, apellido, telefono, email, IdRol, contrasena) VALUES (@nombre, @apellido, @telefono, @email, @idRol, @contrasena)";
                 
                 using (var comando = new MySqlCommand(query, conexion))
                 {
@@ -30,6 +29,7 @@ namespace Legendary_Motorsport_Backend.Repositories
                     comando.Parameters.AddWithValue("@telefono", cliente.Telefono);
                     comando.Parameters.AddWithValue("@email", cliente.Email);
                     comando.Parameters.AddWithValue("@idRol", cliente.IdRol);
+                    comando.Parameters.AddWithValue("@contrasena", cliente.ContrasenaHash);
 
                     int filasAfectadas = await comando.ExecuteNonQueryAsync();
                     return filasAfectadas > 0;
@@ -44,7 +44,7 @@ namespace Legendary_Motorsport_Backend.Repositories
             using (var conexion = _conexionDb.ObtenerConexion())
             {
                 await conexion.OpenAsync();
-                string query = "SELECT IdCliente, Nombre, Apellido, Telefono, Email, IdRol, FechaCreacion FROM Clientes";
+                string query = "SELECT IdCliente, nombre, apellido, telefono, email, IdRol, fechaCreacion FROM Cliente";
                 
                 using (var comando = new MySqlCommand(query, conexion))
                 using (var lector = await comando.ExecuteReaderAsync())
@@ -54,17 +54,127 @@ namespace Legendary_Motorsport_Backend.Repositories
                         clientes.Add(new Cliente
                         {
                             IdCliente = Convert.ToInt32(lector["IdCliente"]),
-                            Nombre = lector["Nombre"].ToString(),
-                            Apellido = lector["Apellido"].ToString(),
-                            Telefono = lector["Telefono"].ToString(),
-                            Email = lector["Email"].ToString(),
+                            Nombre = lector["nombre"].ToString(),
+                            Apellido = lector["apellido"].ToString(),
+                            Telefono = lector["telefono"].ToString(),
+                            Email = lector["email"].ToString(),
                             IdRol = Convert.ToInt32(lector["IdRol"]),
-                            FechaCreacion = Convert.ToDateTime(lector["FechaCreacion"])
+                            FechaCreacion = Convert.ToDateTime(lector["fechaCreacion"])
                         });
                     }
                 }
             }
             return clientes;
+        }
+
+        public async Task<Cliente?> ObtenerPorIdAsync(int idCliente)
+        {
+            using (var conexion = _conexionDb.ObtenerConexion())
+            {
+                await conexion.OpenAsync();
+                string query = "SELECT IdCliente, nombre, apellido, telefono, email, IdRol, fechaCreacion FROM Cliente WHERE IdCliente = @idCliente";
+
+                using (var comando = new MySqlCommand(query, conexion))
+                {
+                    comando.Parameters.AddWithValue("@idCliente", idCliente);
+                    using (var lector = await comando.ExecuteReaderAsync())
+                    {
+                        if (await lector.ReadAsync())
+                        {
+                            return new Cliente
+                            {
+                                IdCliente = Convert.ToInt32(lector["IdCliente"]),
+                                Nombre = lector["nombre"].ToString(),
+                                Apellido = lector["apellido"].ToString(),
+                                Telefono = lector["telefono"].ToString(),
+                                Email = lector["email"].ToString(),
+                                IdRol = Convert.ToInt32(lector["IdRol"]),
+                                FechaCreacion = Convert.ToDateTime(lector["fechaCreacion"])
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<Cliente?> ObtenerPorEmailAsync(string email)
+        {
+            using (var conexion = _conexionDb.ObtenerConexion())
+            {
+                await conexion.OpenAsync();
+                string query = "SELECT IdCliente, nombre, apellido, telefono, email, IdRol, fechaCreacion, contrasena FROM Cliente WHERE email = @email";
+
+                using (var comando = new MySqlCommand(query, conexion))
+                {
+                    comando.Parameters.AddWithValue("@email", email);
+                    using (var lector = await comando.ExecuteReaderAsync())
+                    {
+                        if (await lector.ReadAsync())
+                        {
+                            return new Cliente
+                            {
+                                IdCliente = Convert.ToInt32(lector["IdCliente"]),
+                                Nombre = lector["nombre"].ToString(),
+                                Apellido = lector["apellido"].ToString(),
+                                Telefono = lector["telefono"].ToString(),
+                                Email = lector["email"].ToString(),
+                                IdRol = Convert.ToInt32(lector["IdRol"]),
+                                FechaCreacion = Convert.ToDateTime(lector["fechaCreacion"]),
+                                ContrasenaHash = lector["contrasena"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<bool> ActualizarClienteAsync(Cliente cliente, bool actualizarContrasena)
+        {
+            using (var conexion = _conexionDb.ObtenerConexion())
+            {
+                await conexion.OpenAsync();
+                string query = actualizarContrasena
+                    ? "UPDATE Cliente SET nombre = @nombre, apellido = @apellido, telefono = @telefono, email = @email, IdRol = @idRol, contrasena = @contrasena WHERE IdCliente = @idCliente"
+                    : "UPDATE Cliente SET nombre = @nombre, apellido = @apellido, telefono = @telefono, email = @email, IdRol = @idRol WHERE IdCliente = @idCliente";
+
+                using (var comando = new MySqlCommand(query, conexion))
+                {
+                    comando.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                    comando.Parameters.AddWithValue("@apellido", cliente.Apellido);
+                    comando.Parameters.AddWithValue("@telefono", cliente.Telefono);
+                    comando.Parameters.AddWithValue("@email", cliente.Email);
+                    comando.Parameters.AddWithValue("@idRol", cliente.IdRol);
+                    comando.Parameters.AddWithValue("@idCliente", cliente.IdCliente);
+
+                    if (actualizarContrasena)
+                    {
+                        comando.Parameters.AddWithValue("@contrasena", cliente.ContrasenaHash);
+                    }
+
+                    int filasAfectadas = await comando.ExecuteNonQueryAsync();
+                    return filasAfectadas > 0;
+                }
+            }
+        }
+
+        public async Task<bool> EliminarClienteAsync(int idCliente)
+        {
+            using (var conexion = _conexionDb.ObtenerConexion())
+            {
+                await conexion.OpenAsync();
+                string query = "DELETE FROM Cliente WHERE IdCliente = @idCliente";
+
+                using (var comando = new MySqlCommand(query, conexion))
+                {
+                    comando.Parameters.AddWithValue("@idCliente", idCliente);
+                    int filasAfectadas = await comando.ExecuteNonQueryAsync();
+                    return filasAfectadas > 0;
+                }
+            }
         }
     }
 }
