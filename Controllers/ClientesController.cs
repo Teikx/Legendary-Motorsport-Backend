@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Legendary_Motorsport_Backend.Services;
+using Legendary_Motorsport_Backend.Models;
 
 namespace Legendary_Motorsport_Backend.Controllers
 {

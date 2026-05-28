@@ -1,4 +1,5 @@
 using Legendary_Motorsport_Backend.Repositories;
+using Legendary_Motorsport_Backend.Models;
 
 namespace Legendary_Motorsport_Backend.Services
 {

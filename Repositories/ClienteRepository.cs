@@ -1,5 +1,6 @@
 using MySqlConnector;
 using Legendary_Motorsport_Backend.Data;
+using Legendary_Motorsport_Backend.Models;
 
 namespace Legendary_Motorsport_Backend.Repositories
 {

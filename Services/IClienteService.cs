@@ -1,3 +1,4 @@
+using Legendary_Motorsport_Backend.Models;
 namespace Legendary_Motorsport_Backend.Services
 {
     public interface IClienteService
