@@ -18,7 +18,7 @@ namespace Legendary_Motorsport_Backend.Repositories
             var carrito = await ObtenerActivoAsync(idCliente);
             if (carrito != null)
             {
-                return carrito;
+                return await ObtenerCarritoDetalleAsync(idCliente, carrito.IdCarrito);
             }
 
             using (var conexion = _conexionDb.ObtenerConexion())
@@ -39,7 +39,7 @@ namespace Legendary_Motorsport_Backend.Repositories
                 throw new InvalidOperationException("No se pudo crear el carrito activo.");
             }
 
-            return creado;
+            return await ObtenerCarritoDetalleAsync(idCliente, creado.IdCarrito);
         }
 
         public async Task<CarritoDto?> ObtenerActivoAsync(int idCliente)

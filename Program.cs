@@ -30,6 +30,14 @@ builder.Services.AddScoped<IVehiculoRepository, VehiculoRepository>();
 builder.Services.AddScoped<ICarritoRepository, CarritoRepository>();
 builder.Services.AddScoped<ICheckoutRepository, CheckoutRepository>();
 
+// Añadir esto debajo de builder.Services.AddScoped<IClienteRepository...
+builder.Services.AddScoped<ITarjetaRepository, TarjetaRepository>();
+builder.Services.AddScoped<ITarjetaService, TarjetaService>();
+
+// Añadir esto en la sección de tus Repositorios y Servicios:
+builder.Services.AddScoped<IDireccionRepository, DireccionRepository>();
+builder.Services.AddScoped<IDireccionService, DireccionService>();
+
 // Servicios (Capa de Lógica de Negocio)
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();

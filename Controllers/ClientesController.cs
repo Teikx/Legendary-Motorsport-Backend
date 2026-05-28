@@ -26,7 +26,7 @@ namespace Legendary_Motorsport_Backend.Controllers
         }
 
         [HttpGet("{idCliente:int}")]
-        [Authorize(Policy = "RequireAdmin")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int idCliente)
         {
             var cliente = await _clienteService.ObtenerPorIdAsync(idCliente);
